@@ -1,12 +1,9 @@
-
-import { setDefinitionMap as definitionMapSetter } from './field-definition-map';
+import {setDefinitionMap as definitionMapSetter} from './field-definition-map';
 
 export namespace MongoTS {
     export const setDefinitionMap = definitionMapSetter;
-    
 }
 
 export * from './core';
-export { ExtendableMongooseDoc } from './core/extendable-mongoose-doc';
+export {ExtendableMongooseDoc} from './core/extendable-mongoose-doc';
 export * from './models/external';
-// export { SlimeSchema } from './models/external'
