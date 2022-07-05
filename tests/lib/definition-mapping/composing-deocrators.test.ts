@@ -2,14 +2,14 @@
 import { expect } from 'chai';
 import { Schema } from 'mongoose';
 import { 
-    Prop, Enum, Required ,TypedSchema, ExtendableMongooseDoc, OnConstructDefinitions, toSchema, Match
+    Prop, Enum, Required ,TypedSchema, OnConstructDefinitions, toSchema, Match
 } from "../../../lib";
 
 enum GenderEnums { 'g', 'f', 'n'}
 const enumKeys = ((eType) => Object.values(eType).filter(e => typeof e == 'string') as string[] );
 
 @TypedSchema({options: { timestamps: true } })
-class PersonalData extends ExtendableMongooseDoc implements OnConstructDefinitions {
+class PersonalData implements OnConstructDefinitions {
     
     @Prop() 
     @Required()  

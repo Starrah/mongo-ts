@@ -5,5 +5,4 @@ export namespace MongoTS {
 }
 
 export * from './core';
-export {ExtendableMongooseDoc} from './core/extendable-mongoose-doc';
 export * from './models/external';

@@ -1,7 +1,7 @@
-import { TypedSchema, ExtendableMongooseDoc, Prop, Method, Enum, toModel, OnConstructDefinitions } from './../../../../../lib/core'
+import { TypedSchema, Prop, Method, Enum, toModel, OnConstructDefinitions } from './../../../../../lib/core'
 
 @TypedSchema()
-class Profile extends ExtendableMongooseDoc {
+class Profile {
     @Prop() firstName: string;
     @Prop() lastName: string;
     @Prop() address: string;

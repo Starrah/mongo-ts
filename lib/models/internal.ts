@@ -1,25 +1,12 @@
-
-import { SchemaOptions } from 'mongoose';
-
-export { PropertyDefinition } from './property-definition.model'
-
-
+import {Document, SchemaOptions, SchemaTypeOptions} from 'mongoose';
 
 export interface TypedSchemaConfig {
     options: SchemaOptions,
     extendsMeta?: any,
 }
 
+export type PropertyDefinition<T = any> = SchemaTypeOptions<T>
+
+export type Doc<T> = T & Document<T>
+
 export * from './utils';
-
-/*
-
-export interface PropertyDefinition  {
-    required: boolean;
-    unique: boolean;
-    default: any;
-    validate: RegExp | ((val: any) => boolean);
-    index: boolean;
-    // enum: string[];
-}
-*/

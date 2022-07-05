@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import { Schema } from 'mongoose';
 import { 
-    Prop, Enum, Required ,TypedSchema, ExtendableMongooseDoc, OnConstructDefinitions, toSchema, Match, ArrayOf, Property, Method, toModel
+    Prop, Enum, Required ,TypedSchema, OnConstructDefinitions, toSchema, Match, ArrayOf, Property, Method, toModel
 } from "../../../lib";
 
 
@@ -34,7 +34,7 @@ export const blogSchemaDef = {
     @Prop() date: Date;
 }
 
-@TypedSchema() class Blog extends ExtendableMongooseDoc {
+@TypedSchema() class Blog {
 
     @Prop({ required: true }) title: string;
     @Prop() author: string;

@@ -1,11 +1,10 @@
 import { expect } from 'chai';
-import { ExtendableMongooseDoc } from '../../../lib/' 
 import { Method, Prop, TypedSchema, Enum, toSchema, OnConstructDefinitions } from '../../../lib/core'
 
 const USER_CAPABILITIES = ['UPDATE', 'DELETE', 'UPDATE_DELETE'];
 
 @TypedSchema()
-class BaseUser extends ExtendableMongooseDoc {
+class BaseUser {
     @Prop() name: string;
     @Prop() email: string;
     @Prop() img: string;

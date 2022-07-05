@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import { Schema } from 'mongoose';
 import { 
-    Prop, Enum, ArrayOf, TypedSchema, ExtendableMongooseDoc, toModel, OnConstructDefinitions, toSchema
+    Prop, Enum, ArrayOf, TypedSchema, toModel, OnConstructDefinitions, toSchema
 } from "../../../lib";
 
 enum GenderEnums { 'g', 'f', 'n'}
@@ -10,7 +10,7 @@ enum PaymentEnums { 'paypal' = 1, 'visa' = 2, 'master' = 3 }
 const enumKeys = ((eType) => Object.values(eType).filter(e => typeof e == 'string') as string[] );
 
 @TypedSchema({options: { timestamps: true } })
-class PersonalData extends ExtendableMongooseDoc implements OnConstructDefinitions {
+class PersonalData implements OnConstructDefinitions {
     @Prop() nickname: string;
     @Prop({required: 'email is required', unique:true, lowercase:true, trim:true, match: /^[\w\.-]+@[\w-]+\.[\w\.-]+$/}) 
     email: string;
@@ -24,19 +24,19 @@ class PersonalData extends ExtendableMongooseDoc implements OnConstructDefinitio
 }
 
 @TypedSchema({options: { timestamps: true } })
-class MetaData extends ExtendableMongooseDoc {
+class MetaData {
     @Prop({default: false })  is_finished_on_boarding: boolean;
     @Prop({default: false }) is_finished_terms_of_use: boolean;
     @Prop({default: true }) is_send_notifications: boolean;
 }
 
 @TypedSchema({options: { timestamps: true } })
-class Payment extends ExtendableMongooseDoc {
+class Payment {
     @Enum(enumKeys(PaymentEnums)) subscription: PaymentEnums;
 }
 
 @TypedSchema({options: { timestamps: true } })
-class User extends ExtendableMongooseDoc implements OnConstructDefinitions {
+class User implements OnConstructDefinitions {
     @ArrayOf('string',  {unique: true, required: true}) uid: string[]
     @Prop() personal_data: PersonalData;
     @Prop() meta_data: MetaData;
