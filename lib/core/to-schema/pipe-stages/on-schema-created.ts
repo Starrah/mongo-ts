@@ -1,5 +1,7 @@
 import {Schema} from 'mongoose'
 
-export interface OnSchemaCreated {
-    onSchemaCreated(schema: Schema): void
+/* Should pass <TypedSchemaClass> as generic type
+* eg: class User implements OnSchemaCreated<User> */
+export interface OnSchemaCreated<T> {
+    onSchemaCreated(schema: Schema<T>): void
 }

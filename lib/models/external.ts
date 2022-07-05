@@ -1,1 +1,1 @@
-export {TypedSchemaConfig, PropertyDefinition, Doc} from './internal'
+export {TypedSchemaConfig, PropertyDefinition, Doc, SchemaDefinitions, SchemaFunctions} from './internal'

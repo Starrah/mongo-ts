@@ -1,19 +1,16 @@
 import * as mongoose from 'mongoose'
-import { ExtendableMongooseDoc } from "./../extendable-mongoose-doc";
-import { toSchema} from './../to-schema';
-import { Ctor, SubType } from "../../models/internal";
+import {toSchema} from '../to-schema';
+import {Ctor} from "../../models/internal";
 
-type PreModelCreationFunc<T> = (scheme: mongoose.Schema<T>) => any; 
+type PreModelCreationFunc<T> = (scheme: mongoose.Schema<T>) => void;
 
-export function toModel<M extends ExtendableMongooseDoc, T extends Ctor<M> = Ctor<M>>(
-    TypedSchemeClass: T, 
+export function toModel<C extends Ctor>(
+    TypedSchemeClass: C,
     modelName: string,
-    preModelCreation: PreModelCreationFunc<T> = (schema) => schema): (SubType<T, Function> & mongoose.Model<M>) {
-    
-    const scheme = toSchema<T, M>(TypedSchemeClass);
-    preModelCreation(scheme);
-    const model = mongoose.model<M>(modelName, scheme);
-
-    return model as (SubType<T, Function> & mongoose.Model<M>);
+    preModelCreation?: PreModelCreationFunc<InstanceType<C>>
+) {
+    const schema = toSchema(TypedSchemeClass);
+    if (preModelCreation) preModelCreation(schema);
+    return mongoose.model(modelName, schema);
 }
 
