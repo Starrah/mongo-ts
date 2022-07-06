@@ -1,21 +1,19 @@
-import { MetadataAgent } from '../../../helpers';
-import { getDefaultDefinition } from '../../../field-definition-map';
+import {getDefaultDefinition} from '../../../field-definition-map';
+import {MetaAgent} from "../../../helpers";
+import {warnInDecorator} from "../../../models/utils";
 
-export function createPropertyDecorator(callerDecorator: string, cb: (targetPrototype: Object, propertyName: string) => {type: any, definition: any}) {
-    
-    return (targetPrototype: Object, propertyName: string): void => {
-
-        const name = targetPrototype.constructor.name
-        if(!MetadataAgent.has(targetPrototype, `isProcessed:${name}`)) { 
+export function createPropertyDecorator(decoratorName: string, cb: (targetPrototype: object, propertyName: string) => { type?: any, definition: any }) {
+    return (targetPrototype: object, propertyName: string): void => {
+        if (!MetaAgent.has("schemaOptions", targetPrototype)) {
             const {type, definition} = cb(targetPrototype, propertyName);
 
-            const customDefaultDefinition = getDefaultDefinition(propertyName, type, callerDecorator);
-            const mergedDefinition = { ...customDefaultDefinition, ...definition }
-            MetadataAgent.assign(targetPrototype, [
-                `schemaDefinitions.${propertyName}`, 
-                type ? { ...mergedDefinition, type } : { ...mergedDefinition }
-            ]);
-            
-        }
+            const customDefaultDefinition = getDefaultDefinition(propertyName, type, decoratorName);
+            const mergedDefinition = {...customDefaultDefinition, ...definition}
+            if (type) mergedDefinition.type = type
+            MetaAgent.merge("schemaDefinitions", mergedDefinition, targetPrototype, propertyName)
+            const o = {};
+            o[propertyName] = true
+            MetaAgent.merge("schemaKeys", o, targetPrototype)
+        } else warnInDecorator(`class ${targetPrototype.constructor.name} already processed! (detected when processing @${decoratorName})`)
     }
 }

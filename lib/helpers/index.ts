@@ -1,159 +1,28 @@
-import { Ctor } from "../models/internal";
-
-type Metadata = { [key: string]: any }
-
-export class MetadataAgent {
-
-    static set<T extends Ctor | Object>(classObject: T, [path, value]: [string, any]): void {
-        const original = classObject;
-        const proto = this.getPrototype(original); 
-        const metadata = proto['$metadata'] || {};
-        setValueUsingNestedPath(metadata, path, value);
-        proto['$metadata'] = metadata;
+export class MetaAgent {
+    private static metaKey(key: string): string {
+        return "mongo-ts-struct:" + key
     }
 
-    static has<T extends Ctor | Object>(classObject: T, path: string): boolean {
-        const original = classObject;
-        const proto = this.getPrototype(original); 
-        const metadata = proto['$metadata'] || {};
-        return hasValueUsingNestedPath(metadata, path);
+    static define(metadataKey: string, metadataValue: any, target: object, propertyKey?: string | symbol): void {
+        metadataKey = MetaAgent.metaKey(metadataKey)
+        return Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey)
     }
 
-    static assign<T extends Ctor | Object>(classObject: T, [path, value]: [string, any]): void {
-        const original = classObject;
-        const proto = this.getPrototype(original); 
-        const metadata = proto['$metadata'] || {};
-        assignValueUsingNestedPath(metadata, path, value);
-        proto['$metadata'] = metadata;
+    static merge(metadataKey: string, metadataValue: any, target: object, propertyKey?: string | symbol): void {
+        metadataKey = MetaAgent.metaKey(metadataKey)
+        const originValue = Reflect.getMetadata(metadataKey, target, propertyKey)
+        if (originValue !== undefined && typeof originValue !== "object")
+            throw new Error(`cannot merge metadata: Reflect.getMetadata(${metadataKey}, ${target}, ${String(propertyKey)}) returned ${originValue}, which should be object or undefined.`)
+        metadataValue = {...originValue, ...metadataValue}
+        return Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey)
     }
 
-    static getMeta<T extends Ctor | Object>(classObject: T): Metadata {
-        const original = classObject;
-        const proto = this.getPrototype(original); 
-        const metadata = proto['$metadata'];
-        return metadata;
+    static get(metadataKey: string, target: object, propertyKey?: string | symbol): any {
+        metadataKey = MetaAgent.metaKey(metadataKey)
+        return Reflect.getMetadata(metadataKey, target, propertyKey)
     }
 
-
-    private static getPrototype(classObject: any) {
-        if(classObject.prototype == undefined) { return classObject; }
-        const proto = classObject.prototype;
-        return proto;
+    static has(metadataKey: string, target: object, propertyKey?: string | symbol): boolean {
+        return !!MetaAgent.get(metadataKey, target, propertyKey)
     }
-}
-
-
-function hasValueUsingNestedPath(obj: object, path: string): boolean {
-    const splitPath = path.split('.');
-    let target = obj;
-    if(!obj || splitPath.length == 0) { return false; }
-
-    for (let i = 0; i < splitPath.length; i++) {
-        const slice = splitPath[i];
-        try {
-            target = target[slice]; 
-            if(target == undefined || target == null) {
-                return false;
-            }
-        } catch (error) {
-            return false;            
-        }
-    }
-    return true;
-
-}
-
-
-function setValueUsingNestedPath(obj: object, path: string, value: any) {
-    const splitPath = path.split('.');
-    if(splitPath.length == 1) {
-        obj[splitPath[0]] = value;
-    } else if(splitPath.length > 1) {
-        /*
-        let valueParentObj = obj;
-        for (let i = 0; i < splitPath.length-1; i++) {
-            const slice = splitPath[i];
-            try {
-                let currentLevel = valueParentObj[slice]; 
-                if(currentLevel == undefined || currentLevel == null) {
-                    valueParentObj[slice] = {};
-                } else if(typeof currentLevel != 'object') {
-                    return false;
-                }
-                valueParentObj = valueParentObj[slice];
-            } catch (error) {
-                return false;                
-            }
-        }
-        */
-        const valueParentObj = digAndBuildPath(obj, splitPath);
-        if(!valueParentObj) {
-            return false;
-        }
-        valueParentObj[splitPath[splitPath.length-1]] = value; 
-        return true;
-    }
-}
-
-
-function assignValueUsingNestedPath(obj: object, path: string, value: any) {
-    const splitPath = path.split('.');
-    if(splitPath.length == 1) {
-        obj[splitPath[0]] = value;
-    } else if(splitPath.length > 1) {
-        /*
-        let valueParentObj = obj;
-        for (let i = 0; i < splitPath.length-1; i++) {
-            const slice = splitPath[i];
-            try {
-                let currentLevel = valueParentObj[slice]; 
-                if(currentLevel == undefined || currentLevel == null) {
-                    valueParentObj[slice] = {};
-                } else if(typeof currentLevel != 'object') {
-                    return false;
-                }
-                valueParentObj = valueParentObj[slice];
-            } catch (error) {
-                return false;                
-            }
-        }
-        */
-        const valueParentObj = digAndBuildPath(obj, splitPath);
-        if(!valueParentObj) {
-            return false;
-        }
-
-        if(typeof value == 'object') {
-            const existingValue = valueParentObj[splitPath[splitPath.length-1]] || {};
-            valueParentObj[splitPath[splitPath.length-1]] = { ...existingValue, ...value};
-        } else {
-            valueParentObj[splitPath[splitPath.length-1]] = value;
-        }
-        return true;
-    }
-}
-
-function digAndBuildPath(obj: object, splitPath: Array<string>): (object | undefined) {
-    let valueParentObj = obj;
-    for (let i = 0; i < splitPath.length-1; i++) {
-        const slice = splitPath[i];
-        try {
-            let currentLevel = valueParentObj[slice]; 
-            if(currentLevel == undefined || currentLevel == null) {
-                valueParentObj[slice] = {};
-            } else if(typeof currentLevel != 'object') {
-                return;
-            }
-            valueParentObj = valueParentObj[slice];
-        } catch (error) {
-            return;                
-        }
-    }
-    return valueParentObj;
-}
-
-export function isTypedSchemaClass(typeCtor: Function): boolean {
-    const name = typeCtor.name;
-    if(!name) { return false; }
-    return MetadataAgent.has(typeCtor, `isProcessed:${name}`);
 }

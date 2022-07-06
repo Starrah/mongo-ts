@@ -1,16 +1,9 @@
-import { createPropertyDecorator } from '../create-property-decorator';
+import {createPropertyDecorator} from '../create-property-decorator';
 
 export function Match(value: RegExp | string) {
-    return createPropertyDecorator('Match', (targetPrototype: Object, propertyName: string) => {
+    return createPropertyDecorator('Match', () => {
         return {
-            type: undefined,
-            definition: requiredDef(value)
+            definition: {match: value}
         }
     })
 }
-
-const requiredDef = (value: RegExp | string) => ({
-    match: value
-})
-
-

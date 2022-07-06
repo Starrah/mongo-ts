@@ -1,17 +1,9 @@
-import { createPropertyDecorator } from '../create-property-decorator';
+import {createPropertyDecorator} from '../create-property-decorator';
 
-
-export function Unique(value: any = true) {
-    return createPropertyDecorator('Unique', (targetPrototype: Object, propertyName: string) => {
+export function Unique(value: boolean = true) {
+    return createPropertyDecorator('Unique', () => {
         return {
-            type: undefined,
-            definition: uniqueDef(value)
+            definition: {unique: value}
         }
     })
 }
-
-const uniqueDef = (value: boolean) => ({
-        unique: value
-});
-
-

@@ -1,46 +1,13 @@
-import { Schema } from 'mongoose';
-import { isTypedSchemaClass } from '../../../../helpers';
-import { toSchema } from '../../../to-schema';
-import { PropertyDefinition } from '../../../../models/internal';
-import { createPropertyDecorator } from '../create-property-decorator';
+import {ensureNoTypeFieldInPropertyDefination, PropertyDefinition} from '../../../../models/internal';
+import {createPropertyDecorator} from '../create-property-decorator';
+import {handleProvidedType} from "../../../infer-type";
 
-type SupportedTypes = 'string' | 'number' | 'boolean' | 'any'; // any is mixin
-
-/**
- * @description 
- *  using the standard syntax:  
- *  { type: [{ type: <TYPE>, default: [] }] }
- *  where <TYPE> is the one of Schema.Types.(String | Number | Boolean | Mixed | TypedSchemaClass) 
- * @param type 
- */
-export function ArrayOf(type: SupportedTypes | Function, definition: Partial<PropertyDefinition> = {}) {
-    
-    return createPropertyDecorator('ArrayOf' ,(targetPrototype: Object, propertyName: string) => {
+export function ArrayOf(type: any, definition: Partial<PropertyDefinition> = {}) {
+    return createPropertyDecorator('ArrayOf', (targetPrototype: object, propertyName: string) => {
+        ensureNoTypeFieldInPropertyDefination('ArrayOf', definition, targetPrototype, propertyName)
         return {
-            type: [{ type: toMatchTypes(type) }],
+            type: [handleProvidedType(type)],
             definition
         }
     });
 }
-
-
-
-
-const toMatchTypes = (type: SupportedTypes | Function) => {
-    switch(type) {
-        case 'string' :
-            return Schema.Types.String;
-        case 'number' :
-            return Schema.Types.Number;
-        case 'boolean' :
-            return Schema.Types.Boolean;
-        case 'any' :
-            return Schema.Types.Mixed;
-        default:
-            if(isTypedSchemaClass(type)) {
-                return toSchema(type as any);
-            } else {
-                return Schema.Types.Mixed;
-            }
-    }
-} 

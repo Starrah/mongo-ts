@@ -1,16 +1,9 @@
-import { createPropertyDecorator } from './../create-property-decorator';
+import {createPropertyDecorator} from '../create-property-decorator';
 
 export function Default(value: any) {
-    return createPropertyDecorator('Default', (targetPrototype: Object, propertyName: string) => {
+    return createPropertyDecorator('Default', () => {
         return {
-            type: undefined,
-            definition: booleanDef(value)
+            definition: {default: value}
         }
     })
 }
-
-const booleanDef = (value: any) => ({
-        default: value
-})
-
-

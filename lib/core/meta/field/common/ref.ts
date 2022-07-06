@@ -1,22 +1,16 @@
-import { Schema } from 'mongoose';
-import { PropertyDefinition } from '../../../../models/external';
-import { createPropertyDecorator } from '../create-property-decorator';
+import {Schema, Types} from 'mongoose';
+import {PropertyDefinition} from '../../../../models/external';
+import {createPropertyDecorator} from '../create-property-decorator';
 
-export function Ref(modelRefName: string, definition: Partial<PropertyDefinition> = {}) {
+export type IDCtors = typeof Schema.Types.ObjectId | typeof Types.ObjectId |
+    typeof String | typeof Number | typeof Buffer
 
-    return createPropertyDecorator('Ref',
-        (targetPrototype: Object, propertyName: string) => {
-            return {
-                type: Schema.Types.ObjectId,
-                definition: { ...definition, ref: modelRefName }
-            };
-        }
-    )
-
-    // return DefineProperty(, { ...definition, ...refDef(modelRefName) });
+export function Ref(modelRefName: string, definition: Partial<PropertyDefinition> = {}, type: IDCtors = Schema.Types.ObjectId) {
+    return createPropertyDecorator('Ref', () => {
+        if (definition.type) type = definition.type // `type` specified in definition has higher priority
+        return {
+            type,
+            definition: {...definition, ref: modelRefName}
+        };
+    })
 }
-
-// const refDef = (modelRefName: string) => ({
-//         ref: modelRefName
-// })
-

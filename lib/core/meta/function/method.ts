@@ -1,14 +1,13 @@
-import { MetadataAgent } from '../../../helpers'
+import {MetaAgent} from "../../../helpers";
+import {warnInDecorator} from "../../../models/utils";
 
 export function Method() {
-
-    return (targetPrototype: Object, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor => {
-        if(!MetadataAgent.has(targetPrototype, 'isProcessed')) { 
-            // take the actual method (decorated by @Method)
-            const method = targetPrototype[propertyName];
-            // insert the method to '$metadata.functions.methods'
-            MetadataAgent.set(targetPrototype, [`functions.methods.${propertyName}`, method]);
-        }
+    return (targetPrototype: object, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor => {
+        if (!MetaAgent.has("schemaOptions", targetPrototype)) {
+            const o = {};
+            o[propertyName] = true
+            MetaAgent.merge("schemaMethods", o, targetPrototype)
+        } else warnInDecorator(`class ${targetPrototype.constructor.name} already processed! (detected when processing @Method)`)
         return propertyDesciptor;
     }
 }
