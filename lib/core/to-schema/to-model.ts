@@ -20,5 +20,5 @@ export function toModelWith<C extends Ctor>(
 ) {
     const schema = toSchema(typedSchemaClass);
     if (preModelCreation) preModelCreation(schema);
-    return connection.model(modelName, schema);
+    return connection.model<InstanceType<C>>(modelName, schema);
 }

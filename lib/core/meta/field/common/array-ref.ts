@@ -1,14 +1,25 @@
-import {Schema} from 'mongoose';
-import {PropertyDefinition} from '../../../../models/internal';
+import {ensureNoTypeFieldInPropertyDefination, PropertyDefinition} from '../../../../models/internal';
 import {createPropertyDecorator} from '../create-property-decorator';
-import {IDCtors} from "./ref";
+import {checkIdType, IDTypes} from "../../../infer-type";
 
-export function ArrayRef(modelRefName: string, definition: Partial<PropertyDefinition> = {}, type: IDCtors = Schema.Types.ObjectId) {
-    return createPropertyDecorator('ArrayRef', () => {
-        if (definition.type) type = definition.type // `type` specified in definition has higher priority
+/**
+ * Decorator that define an array of ref property by a provided model name.
+ * A ref property saves the _id for another document in another model, and can be populated.
+ * See https://mongoosejs.com/docs/populate.html for details and usage.
+ *
+ * Note: you should use `import {Types} from 'mongoose'` and `Types.ObjectId` to define a property with type ObjectId.
+ * Using `import {ObjectId} from 'mongoose'` **is wrong**, since it is only a TS type, not a class.
+ * @param modelRefName the name of the model which this ref property references.
+ * @param IDType the actual type saved in the database, or equivalent, the type of _id in the referenced model. This parameter is **required**, since we cannot infer the ID type for an array. Supported values: ObjectId, String, Number, Buffer.
+ * @param definition the extra definition. Default: {}
+ */
+export function ArrayRef(modelRefName: string, IDType: IDTypes, definition: Partial<PropertyDefinition> = {}) {
+    return createPropertyDecorator('ArrayRef', (targetPrototype: object, propertyName: string) => {
+        ensureNoTypeFieldInPropertyDefination('ArrayRef', definition, targetPrototype, propertyName)
+        checkIdType(IDType, targetPrototype, propertyName)
         return {
-            type: Array.isArray(type) ? type : [{type, ref: modelRefName}],
+            type: [{IDType, ref: modelRefName}],
             definition
         }
-    });
+    })
 }

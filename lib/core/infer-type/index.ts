@@ -36,7 +36,7 @@ function designTypeToMongooseType(type: Function, targetPrototype: object, prope
     }
 }
 
-export function getMongooseType(targetPrototype: object, propertyName: string) {
+export function inferMongooseType(targetPrototype: object, propertyName: string) {
     return designTypeToMongooseType(getDesignType(targetPrototype, propertyName), targetPrototype, propertyName)
 }
 
@@ -48,4 +48,27 @@ export function handleProvidedType(type: any) {
         type = toSchema(type)
     }
     return type;
+}
+
+const idTypes = [Schema.Types.ObjectId, Types.ObjectId, String, Number, Buffer]
+
+export type IDTypes = typeof idTypes[number]
+
+export function inferIdType(targetPrototype: object, propertyName: string): IDTypes {
+    const type = getDesignType(targetPrototype, propertyName)
+    switch (type) {
+        case String:
+        case Number:
+        case Buffer:
+            return <IDTypes>type
+        case Schema.Types.ObjectId:
+        case Types.ObjectId:
+            return Schema.Types.ObjectId
+        default:
+            throw new Error(`the IDType for ref property ${propertyPrintName(targetPrototype, propertyName)} cannot be inferred. Please specify the IDType parameter manually, see the doc of @Ref for details.`)
+    }
+}
+
+export function checkIdType(type, targetPrototype: object, propertyName: string) {
+    if (idTypes.indexOf(type) === -1) throw new Error(`the IDType for ref property ${propertyPrintName(targetPrototype, propertyName)} is not supported. Only Types.ObjectId, String, Number, Buffer can be IDType.`)
 }
