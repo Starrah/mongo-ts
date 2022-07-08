@@ -1,4 +1,4 @@
-import {ensureNoTypeFieldInPropertyDefination, PropertyDefinition} from '../../../../models/internal';
+import {ensureNoTypeFieldInPropertyDefinition, PropertyDefinition} from '../../../../models/internal';
 import {createPropertyDecorator} from '../create-property-decorator';
 import {checkIdType, IDTypes} from "../../../infer-type";
 
@@ -15,7 +15,7 @@ import {checkIdType, IDTypes} from "../../../infer-type";
  */
 export function ArrayRef(modelRefName: string, IDType: IDTypes, definition: Partial<PropertyDefinition> = {}) {
     return createPropertyDecorator('ArrayRef', (targetPrototype: object, propertyName: string) => {
-        ensureNoTypeFieldInPropertyDefination('ArrayRef', definition, targetPrototype, propertyName)
+        ensureNoTypeFieldInPropertyDefinition('ArrayRef', definition, targetPrototype, propertyName)
         checkIdType(IDType, targetPrototype, propertyName)
         return {
             type: [{IDType, ref: modelRefName}],

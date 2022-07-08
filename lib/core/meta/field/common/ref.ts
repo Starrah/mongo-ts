@@ -1,4 +1,4 @@
-import {ensureNoTypeFieldInPropertyDefination, PropertyDefinition} from '../../../../models/internal';
+import {ensureNoTypeFieldInPropertyDefinition, PropertyDefinition} from '../../../../models/internal';
 import {createPropertyDecorator} from '../create-property-decorator';
 import {checkIdType, IDTypes, inferIdType} from "../../../infer-type";
 
@@ -15,7 +15,7 @@ import {checkIdType, IDTypes, inferIdType} from "../../../infer-type";
  */
 export function Ref(modelRefName: string, IDType?: IDTypes, definition: Partial<PropertyDefinition> = {},) {
     return createPropertyDecorator('Ref', (targetPrototype: object, propertyName: string) => {
-        ensureNoTypeFieldInPropertyDefination('Ref', definition, targetPrototype, propertyName)
+        ensureNoTypeFieldInPropertyDefinition('Ref', definition, targetPrototype, propertyName)
         if (!IDType) IDType = inferIdType(targetPrototype, propertyName)
         checkIdType(IDType, targetPrototype, propertyName)
         return {

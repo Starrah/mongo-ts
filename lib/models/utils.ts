@@ -9,7 +9,7 @@ export function propertyPrintName(targetPrototype: object, propertyName: string)
     return `${targetPrototype.constructor.name}.${propertyName}`
 }
 
-export function ensureNoTypeFieldInPropertyDefination(decoratorName: string, definition: Partial<PropertyDefinition>, targetPrototype: object, propertyName: string) {
+export function ensureNoTypeFieldInPropertyDefinition(decoratorName: string, definition: Partial<PropertyDefinition>, targetPrototype: object, propertyName: string) {
     if (definition.type !== undefined)
         throw new Error(`SchemaTypeOptions (at ${propertyPrintName(targetPrototype, propertyName)}) should not have 'type' field. If you do want to manually specify the type for this property, please use @Property instead of @${decoratorName}.`)
 }
