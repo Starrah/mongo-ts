@@ -1,14 +1,12 @@
-import {Document, SchemaOptions, SchemaTypeOptions} from 'mongoose';
+import {HydratedDocument, SchemaTypeOptions} from 'mongoose';
 import {Ctor, SubType} from "./utils";
 import {MetaAgent} from "../helpers";
-
-export type TypedSchemaConfig = SchemaOptions
 
 export interface PropertyDefinition<T = any> extends SchemaTypeOptions<T> {
     type: never;
 }
 
-export type Doc<T> = T & Document<T>
+export type Doc<T> = HydratedDocument<T>
 
 export type SchemaDefinitions<T> = { [path in keyof T]: any }
 
