@@ -18,10 +18,8 @@ export {Mixed} from './field/common/mixed';
 export {Property} from './field/property';
 export {Prop} from './field/prop';
 
-// instance class method
+// instance / static class method
 export {Method} from './function/method';
-
-// static class method
 export {Static} from './function/static';
 
 // schema class

@@ -3,11 +3,12 @@ import {Ctor, propertyPrintName, Schema_Types_Map} from "../../models/utils";
 import {MetaAgent} from "../../helpers";
 import {isTypedSchema, SchemaFunctions} from "../../models/internal";
 
-function getSchemaFunctions(metadataKey: "schemaMethods" | "schemaStatics", target: Ctor) {
-    const names = Object.keys(MetaAgent.get(metadataKey, target) ?? {})
-    if (metadataKey === "schemaMethods") target = target.prototype
+function getSchemaFunctions(metadataKey: "schemaMethods" | "schemaStatics", ctor: Ctor) {
+    const names = Object.keys(MetaAgent.get(metadataKey, ctor) ?? {})
+    const target = metadataKey === "schemaStatics" ? ctor : ctor.prototype
     const result: any = {}
     for (const name of names) {
+        if (!target[name]) throw new Error(`On ${propertyPrintName(ctor, name)}: function staticity error! @Method must be used on non-static method, while @Static must be used on static method!`)
         result[name] = target[name]
     }
     return result
