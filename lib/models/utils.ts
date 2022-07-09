@@ -1,9 +1,14 @@
 import {PropertyDefinition} from "./internal";
 import {Schema} from "mongoose";
+import {MetaAgent} from "../helpers";
 
 export type SubType<Base, Condition> = Pick<Base, { [Key in keyof Base]: Base[Key] extends Condition ? Key : never }[keyof Base]>;
 
 export type Ctor<T = any> = new(...args: any[]) => T;
+
+export function isTypedSchema(type: Function) {
+    return MetaAgent.has("schemaOptions", type)
+}
 
 export function propertyPrintName(targetPrototype: object, propertyName: string) {
     return `${targetPrototype.constructor.name}.${propertyName}`

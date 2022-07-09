@@ -1,6 +1,5 @@
 import {HydratedDocument, SchemaTypeOptions, UnpackedIntersection} from 'mongoose';
 import {Ctor, SubType} from "./utils";
-import {MetaAgent} from "../helpers";
 
 export interface PropertyDefinition<T = any> extends SchemaTypeOptions<T> {
     type: never;
@@ -12,13 +11,12 @@ export type Populated<T, TypeForRefFields> = UnpackedIntersection<T, TypeForRefF
 
 export type SchemaDefinitions<T> = { [path in keyof T]: any }
 
-export type SchemaFunctions<C extends Ctor> = {
-    methods: SubType<InstanceType<C>, Function>,
-    statics: SubType<C, Function>
-}
+export type MethodsInClass<C extends Ctor> = SubType<InstanceType<C>, Function>
+export type StaticsInClass<C extends Ctor> = SubType<C, Function>
 
-export function isTypedSchema(type: Function) {
-    return MetaAgent.has("schemaOptions", type)
+export type SchemaFunctions<C extends Ctor> = {
+    methods: MethodsInClass<C>,
+    statics: StaticsInClass<C>
 }
 
 export * from './utils';

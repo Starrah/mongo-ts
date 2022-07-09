@@ -1,7 +1,8 @@
 import * as mongoose from 'mongoose'
-import {Ctor, isTypedSchema, SchemaFunctions} from "../../models/internal";
-import {MetaAgent} from "../../helpers";
+import {Model} from 'mongoose'
 import {toSchemaDefinition} from "./to-schema-definition";
+import {Ctor, isTypedSchema, MethodsInClass, SchemaFunctions, StaticsInClass} from "../../models/internal";
+import {MetaAgent} from "../../helpers";
 
 function callHook(hookName: "onSchemaCached" | "onSchemaCreated" | "onSchemaBounded", typedSchemaClass: Ctor, schema: mongoose.Schema) {
     if (typeof typedSchemaClass.prototype[hookName] == 'function') {
@@ -9,7 +10,10 @@ function callHook(hookName: "onSchemaCached" | "onSchemaCreated" | "onSchemaBoun
     }
 }
 
-export function toSchema<C extends Ctor>(typedSchemaClass: C): mongoose.Schema<InstanceType<C>> {
+export function toSchema<C extends Ctor, TQueryHelpers = {}, TOverrides = {},
+    TInstanceMethods = MethodsInClass<C>, TStaticMethods = StaticsInClass<C>,
+    M extends Model<InstanceType<C>> = Model<InstanceType<C>, TQueryHelpers, TInstanceMethods & TOverrides> & TStaticMethods>
+(typedSchemaClass: C): mongoose.Schema<InstanceType<C>, M, TInstanceMethods, TQueryHelpers> {
     if (!isTypedSchema(typedSchemaClass)) throw new Error(`Class ${typedSchemaClass.constructor.name} is not TypedSchema. Did you forget to add @TypedSchema on it?`)
     const cache = MetaAgent.get("cachedSchema", typedSchemaClass)
     if (cache) {
@@ -23,7 +27,7 @@ export function toSchema<C extends Ctor>(typedSchemaClass: C): mongoose.Schema<I
 
     // make Schema instance
     const schemaOptions = MetaAgent.get("schemaOptions", typedSchemaClass)
-    const schema = new mongoose.Schema<InstanceType<C>>(schemaDefinitions, schemaOptions);
+    const schema = new mongoose.Schema<InstanceType<C>, M, TInstanceMethods, TQueryHelpers>(schemaDefinitions, schemaOptions);
     callHook("onSchemaCreated", typedSchemaClass, schema)
 
     // assign class method to the schema.
