@@ -1,13 +1,9 @@
-import {HydratedDocument, SchemaTypeOptions, UnpackedIntersection} from 'mongoose';
+import {SchemaTypeOptions} from "mongoose";
 import {Ctor, SubType} from "./utils";
 
 export interface PropertyDefinition<T = any> extends SchemaTypeOptions<T> {
     type: never;
 }
-
-export type Doc<T> = HydratedDocument<T>
-
-export type Populated<T, TypeForRefFields> = UnpackedIntersection<T, TypeForRefFields>
 
 export type SchemaDefinitions<T> = { [path in keyof T]: any }
 

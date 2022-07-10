@@ -1,7 +1,8 @@
 import {Schema, Types} from 'mongoose';
 import 'reflect-metadata'
-import {Ctor, isTypedSchema, propertyPrintName, Schema_Types_Map} from "../../models/internal";
+import {Ctor, isTypedSchema, propertyPrintName} from "../../models/utils";
 import {toSchema, toSchemaDefinition} from "../to-schema";
+import {Schema_Types_Map} from "../../helpers/compability";
 
 export function getDesignType(targetPrototype: object, propertyName: string): Function {
     const design_type = Reflect.getMetadata('design:type', targetPrototype, propertyName)
@@ -69,7 +70,7 @@ export function inferIdType(targetPrototype: object, propertyName: string): IDTy
                 // when the design:type is another TypedSchema, see the corresponding schemaDefinitions:
                 // if there is definition for _id, then use it; else, use ObjectId.
                 const definition = toSchemaDefinition(<Ctor>type).schemaDefinitions
-                return (<any>definition._id)?.type || definition._id || Schema.Types.ObjectId
+                return ((<any>definition)._id)?.type || (<any>definition)._id || Schema.Types.ObjectId
             } else throw new Error(`the IDType for ref property ${propertyPrintName(targetPrototype, propertyName)} cannot be inferred. Please specify the IDType parameter manually, see the doc of @Ref for details.`)
     }
 }

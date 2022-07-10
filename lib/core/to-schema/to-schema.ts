@@ -1,19 +1,20 @@
 import * as mongoose from 'mongoose'
-import {Model} from 'mongoose'
 import {toSchemaDefinition} from "./to-schema-definition";
 import {Ctor, isTypedSchema, MethodsInClass, SchemaFunctions, StaticsInClass} from "../../models/internal";
 import {MetaAgent} from "../../helpers";
+import {Model} from "../../helpers/compability";
 
-function callHook(hookName: "onSchemaCached" | "onSchemaCreated" | "onSchemaBounded", typedSchemaClass: Ctor, schema: mongoose.Schema) {
+function callHook<T>(hookName: "onSchemaCached" | "onSchemaCreated" | "onSchemaBounded", typedSchemaClass: Ctor, schema: mongoose.Schema<T>) {
     if (typeof typedSchemaClass.prototype[hookName] == 'function') {
         typedSchemaClass.prototype[hookName](schema);
     }
 }
 
-export function toSchema<C extends Ctor, TQueryHelpers = {}, TOverrides = {},
+export function toSchema<C extends Ctor, TQueryHelpers = {}, TOverrides = {}, TVirtuals = {},
     TInstanceMethods = MethodsInClass<C>, TStaticMethods = StaticsInClass<C>,
-    M extends Model<InstanceType<C>> = Model<InstanceType<C>, TQueryHelpers, TInstanceMethods & TOverrides> & TStaticMethods>
-(typedSchemaClass: C): mongoose.Schema<InstanceType<C>, M, TInstanceMethods, TQueryHelpers> {
+    M extends mongoose.Model<InstanceType<C>> = Model<InstanceType<C>, TQueryHelpers, TInstanceMethods & TOverrides, TVirtuals> & TStaticMethods>
+// @ts-ignore
+(typedSchemaClass: C): mongoose.Schema<InstanceType<C>, M, TInstanceMethods, TQueryHelpers, TVirtuals> {
     if (!isTypedSchema(typedSchemaClass)) throw new Error(`Class ${typedSchemaClass.constructor.name} is not TypedSchema. Did you forget to add @TypedSchema on it?`)
     const cache = MetaAgent.get("cachedSchema", typedSchemaClass)
     if (cache) {
@@ -27,7 +28,8 @@ export function toSchema<C extends Ctor, TQueryHelpers = {}, TOverrides = {},
 
     // make Schema instance
     const schemaOptions = MetaAgent.get("schemaOptions", typedSchemaClass)
-    const schema = new mongoose.Schema<InstanceType<C>, M, TInstanceMethods, TQueryHelpers>(schemaDefinitions, schemaOptions);
+    // @ts-ignore
+    const schema = new mongoose.Schema<InstanceType<C>, M, TInstanceMethods, TQueryHelpers, TVirtuals>(schemaDefinitions, schemaOptions);
     callHook("onSchemaCreated", typedSchemaClass, schema)
 
     // assign class method to the schema.
