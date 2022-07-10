@@ -1,6 +1,7 @@
 import {Schema} from "mongoose";
-import {Ctor, isTypedSchema, propertyPrintName, Schema_Types_Map, SchemaFunctions} from "../../models/internal";
+import {Ctor, isTypedSchema, propertyPrintName, SchemaFunctions} from "../../models/internal";
 import {MetaAgent} from "../../helpers";
+import {Schema_Types_Map} from "../../helpers/compability";
 
 function getSchemaFunctions(metadataKey: "schemaMethods" | "schemaStatics", ctor: Ctor) {
     const names = Object.keys(MetaAgent.get(metadataKey, ctor) ?? {})
