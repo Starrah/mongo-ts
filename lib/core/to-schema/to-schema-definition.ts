@@ -1,7 +1,6 @@
-import {Schema, SchemaDefinition, SchemaDefinitionType} from "mongoose";
-import {Ctor, propertyPrintName, Schema_Types_Map} from "../../models/utils";
+import {Schema} from "mongoose";
+import {Ctor, isTypedSchema, propertyPrintName, Schema_Types_Map, SchemaFunctions} from "../../models/internal";
 import {MetaAgent} from "../../helpers";
-import {isTypedSchema, SchemaFunctions} from "../../models/internal";
 
 function getSchemaFunctions(metadataKey: "schemaMethods" | "schemaStatics", ctor: Ctor) {
     const names = Object.keys(MetaAgent.get(metadataKey, ctor) ?? {})
@@ -14,7 +13,7 @@ function getSchemaFunctions(metadataKey: "schemaMethods" | "schemaStatics", ctor
     return result
 }
 
-type ToSchemaDefinitionReturns<C extends Ctor> = { schemaDefinitions: SchemaDefinition<SchemaDefinitionType<InstanceType<C>>>, functions: SchemaFunctions<C> }
+type ToSchemaDefinitionReturns<C extends Ctor> = { schemaDefinitions: ConstructorParameters<typeof Schema<InstanceType<C>>>[0], functions: SchemaFunctions<C> }
 
 export function toSchemaDefinition<C extends Ctor>(typedSchemaClass: C): ToSchemaDefinitionReturns<C> {
     if (!isTypedSchema(typedSchemaClass)) throw new Error(`Class ${typedSchemaClass.constructor.name} is not TypedSchema. Did you forget to add @TypedSchema on it?`)
