@@ -39,7 +39,7 @@
     "@types/express": "^4.16.1",
     "@types/mocha": "^5.2.6",
     "chai": "^4.2.0",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "config": "^3.0.1",
     "ts-node": "^8.0.2",
     "typescript": "^3.3.3333"
