@@ -1,6 +1,6 @@
 {
   "name": "mongo-ts-struct",
-  "version": "1.1.0",
+  "version": "1.1.0-noMongooseDependency",
   "description": "Mongoose wrapper for Typescript supports",
   "main": "dist/index.js",
   "os": [
@@ -42,12 +42,12 @@
     "mocha": "^6.1.4",
     "config": "^3.0.1",
     "ts-node": "^8.0.2",
-    "typescript": "^3.3.3333"
-  },
-  "dependencies": {
+    "typescript": "^3.3.3333",
     "@types/mongoose": "^5.3.20",
     "mongoose": "^5.4.16",
-    "@types/node": "^11.9.5",
+    "@types/node": "^11.9.5"
+  },
+  "dependencies": {
     "reflect-metadata": "^0.1.13"
   },
   "files": [
